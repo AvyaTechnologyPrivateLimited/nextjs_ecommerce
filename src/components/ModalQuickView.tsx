@@ -7,7 +7,7 @@ import ProductQuickView from "./ProductQuickView";
 
 export interface ModalQuickViewProps {
   show: boolean;
-  data;
+  data: any;
   onCloseModalQuickView: () => void;
 }
 

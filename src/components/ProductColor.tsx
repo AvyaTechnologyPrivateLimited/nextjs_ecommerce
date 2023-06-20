@@ -4,7 +4,7 @@ import React, { FC, useState } from "react";
 
 
 export interface ProductColorProps {
-  colors
+  colors: any
 }
 
 const ProductColor: FC<ProductColorProps> = ({
@@ -46,7 +46,7 @@ const ProductColor: FC<ProductColorProps> = ({
     
     return (
       <div className="flex space-x-1">
-        {colors.map((color) => (
+        {colors.map((color: any) => (
           <div
             key={color.id}
             onClick={() => setVariantActive(color.id)}

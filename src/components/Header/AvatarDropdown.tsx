@@ -7,7 +7,7 @@ import Avatar from "@/shared/Avatar/Avatar";
 import Link from "next/link";
 import Cookies from "js-cookie";
 
-export default function AvatarDropdown(props) {
+export default function AvatarDropdown(props: any) {
 
   const handleLogout =  () => {
     Cookies.remove("isLoggedIn");

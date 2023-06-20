@@ -22,7 +22,7 @@ import ProductColor from "./ProductColor";
 
 export interface ProductQuickViewProps {
   className?: string;
-  data;
+  data: any;
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", data }) => {
@@ -54,7 +54,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", data }) =
           qualitySelected={qualitySelected}
           show={t.visible}
           sizeSelected={sizeSelected}
-          variantActive=""
+          variantActive={0}
         />
       ),
       { position: "top-right", id: "nc-product-notify", duration: 3000 }
@@ -76,7 +76,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", data }) =
           </label>
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-2.5">
-          {api_sizes.map((size) => {
+          {api_sizes.map((size: any) => {
             const isActive = size === sizeSelected;
             const sizeOutStock = !api_sizes.includes(size);
             return (
@@ -209,7 +209,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", data }) =
             </div>
 
             {/* STATUS */}
-            <ProductBadge status={badge} />
+            <ProductBadge badge={badge} />
             {/* META FAVORITES */}
             <LikeButton className="absolute right-3 top-3 " />
           </div>

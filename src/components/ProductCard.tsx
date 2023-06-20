@@ -22,7 +22,7 @@ import ProductColor from "./ProductColor";
 
 export interface ProductCardProps {
   className?: string;
-  data;
+  data: any;
   isLiked?: boolean;
 }
 
@@ -168,7 +168,7 @@ const ProductCard: FC<ProductCardProps> = ({
               alt="product"
             />
           </Link>
-          <ProductBadge status={badge} />
+          <ProductBadge badge={badge} />
           <LikeButton liked={isLiked} className="absolute top-3 right-3 z-10" />
           {renderGroupButtons()}
         </div>

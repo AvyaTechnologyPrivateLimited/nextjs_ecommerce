@@ -1,5 +1,5 @@
 'use client';
-import React, { FC, useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import facebookSvg from "@/images/Facebook.svg";
 import googleSvg from "@/images/Google.svg";
 import Input from "@/shared/Input/Input";
@@ -35,7 +35,7 @@ const PageLogin = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({email, password});
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -95,8 +95,8 @@ const PageLogin = () => {
       // Reset form
       setEmail('');
       setPassword('');
-      setErrors({});
-    } catch (error) {
+      //setErrors({});
+    } catch (error: any) {
       toast.error(error.response.data.message);
     }
 
@@ -104,7 +104,7 @@ const PageLogin = () => {
     setIsLoading(false);
     setEmail('');
     setPassword('');
-    setErrors({});
+    //setErrors({});
   };
 
   return (

@@ -48,7 +48,7 @@ function Navigation() {
 
   return (
     <ul className="nc-Navigation flex items-center">
-      {menu.map((item) => (
+      {menu.map((item: any) => (
         <NavigationItem key={item.id} menuItem={item} />
       ))}
     </ul>

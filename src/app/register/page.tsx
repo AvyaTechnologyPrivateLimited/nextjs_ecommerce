@@ -1,5 +1,5 @@
 'use client';
-import React, { FC, useState, useEffect } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import facebookSvg from "@/images/Facebook.svg";
 import googleSvg from "@/images/Google.svg";
 import Input from "@/shared/Input/Input";
@@ -11,7 +11,7 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import config from '../../custom/config';
-import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object({
   name: Yup.string().required('Email is required'),
@@ -33,33 +33,32 @@ const loginSocials = [
 ];
 
 const PageSignUp = () => {
-  const router = useRouter();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({name, email, password});
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
 
-  const handleEmailChange = (e) => {
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     //console.log(config);
     e.preventDefault();
 
     // Perform validation
-    const errors = {};
+    const errors = {name, email, password};
     if (!name) {
       errors.name = 'Name is required';
     }
@@ -87,23 +86,23 @@ const PageSignUp = () => {
       const response = await axios.post(`${config.API_URL}register`, {
         name,
         email,
-        password,
+        password
       });
 
       // Handle successful login response here
       let login_data = response.data;
-      localStorage.setItem("isLoggedIn", true);
-      localStorage.setItem("name", login_data.name);
-      localStorage.setItem("access_token", login_data.access_token);
+      Cookies.set("isLoggedIn", String(true));
+      Cookies.set("name",login_data.name);
+      Cookies.set("access_token",login_data.access_token);
       toast.success(login_data.message);
-      router.push('/');
+      window.location.replace("/");
       
       // Reset form
       setName('');
       setEmail('');
       setPassword('');
-      setErrors({});
-    } catch (response) {
+      //setErrors({});
+    } catch (response: any) {
       // Handle login error here
       //console.log(response.response.data);
       let errors = response.response.data

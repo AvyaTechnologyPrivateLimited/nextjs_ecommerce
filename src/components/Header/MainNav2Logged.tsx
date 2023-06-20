@@ -19,17 +19,13 @@ const MainNav2Logged: FC<MainNav2LoggedProps> = () => {
   const router = useRouter();
   
   const [name, setName] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if(Cookies.get("isLoggedIn"))
+    if(Cookies.get("access_token"))
     {
       setIsLoggedIn(true);
-      setName(Cookies.get("name"));
-    }
-    else
-    {
-      setIsLoggedIn(false);
+      setName(String(Cookies.get("name")));
     }
   }, []);
 
