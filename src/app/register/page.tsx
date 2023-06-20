@@ -37,7 +37,11 @@ const PageSignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({name, email, password});
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: ''
+  });
 
   const [isLoading, setIsLoading] = useState(false);
 

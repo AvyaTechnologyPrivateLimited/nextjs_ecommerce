@@ -39,7 +39,7 @@ function Navigation() {
     },
     {
       id: ncNanoId(),
-      href: "/category",
+      href: "/products",
       name: "Collections",
       type: "megaMenu",
       children: MEGAMENU_TEMPLATES,

@@ -35,7 +35,10 @@ const PageLogin = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({email, password});
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,7 +55,7 @@ const PageLogin = () => {
     e.preventDefault();
 
     // Perform validation
-    const errors = {email, password};
+    
     if (!email) {
       errors.email = 'Email is required';
     }
