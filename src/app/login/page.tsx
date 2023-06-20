@@ -8,6 +8,8 @@ import axios from 'axios';
 import LoginWithSocial from "../../components/LoginWithSocial";
 import React, { useState } from "react";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import config from '../../custom/config';
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -25,9 +27,34 @@ const PageLogin = () => {
     validationSchema,
     onSubmit: (values) => {
       // Handle form submission
-      console.log(values);
+      //console.log(values);
+      setIsLoading(true);
+
+      attempt(values);
+
     }
   });
+
+  const attempt = async (values: any) => {
+    try {
+      // Send login request
+      const response = await axios.post(`${config.API_URL}login`, values);
+
+      // Handle successful login response here
+      let login_data = response.data;
+
+      Cookies.set("isLoggedIn", String(true));
+      Cookies.set("name",login_data.name);
+      Cookies.set("access_token",login_data.access_token);
+
+      toast.success(login_data.message);
+      window.location.replace("/");
+      
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <>
