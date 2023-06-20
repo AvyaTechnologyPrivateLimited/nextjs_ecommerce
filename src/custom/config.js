@@ -1,5 +1,5 @@
 let dev_url = 'http://127.0.0.1:8000/';
-let server_url = 'http://127.0.0.1:8000/';
+let server_url = 'https://av-ecom-cms.avdemosites.com/';
 const mode = 'development';
 
 const dev = {
