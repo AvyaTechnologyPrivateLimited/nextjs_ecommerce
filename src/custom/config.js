@@ -11,5 +11,5 @@ const server = {
     ASSET_URL: server_url+"api/"
 }
 const config = process.env.NODE_ENV === 'development' ? dev : server;
-console.log(config);
+//console.log(config);
 export default config;
