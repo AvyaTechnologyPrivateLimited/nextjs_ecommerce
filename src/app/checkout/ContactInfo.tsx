@@ -1,10 +1,26 @@
+"use client";
 import Label from "@/components/Label/Label";
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import Input from "@/shared/Input/Input";
+import Cookies from "js-cookie";
+import Link from "next/link";
 
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import config from '../../custom/config';
+import axios from 'axios';
+import toast from "react-hot-toast";
+
+const validationSchema = Yup.object().shape({
+  phone: Yup.string()
+            .required('Phone is required')
+            .min(10, 'Min value should be 10 digits.')
+            .max(15, 'Max value should be 15 digits.'),
+  email: Yup.string().email('Invalid email').required('Email is required'),
+});
 interface Props {
   isActive: boolean;
   onOpenActive: () => void;
@@ -12,6 +28,72 @@ interface Props {
 }
 
 const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
+  const [userName, setUserName] = useState("")
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userPhone, setPhone] = useState("")
+  const [userEmail, setEmail] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const access_token = Cookies.get("access_token");
+    if(access_token)
+    {
+      setIsLoggedIn(true);
+      const un = Cookies.get("name");
+      if(un)
+      {
+        setUserName(un);
+      }
+
+      const em = Cookies.get("email");
+      if(em)
+      {
+        setEmail(em);
+      }
+
+      const ph = Cookies.get("phone");
+      if(ph)
+      {
+        setPhone(ph);
+      }
+    }
+    //getCartData();
+  }, [])
+
+  const formik = useFormik({
+    initialValues: {
+      phone: '',
+      email: ''
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      // Handle form submission
+      //console.log(values);
+      setIsLoading(true);
+
+      attempt(values);
+
+    }
+  });
+
+  const attempt = async (values: any) => {
+    try {
+      const access_token = Cookies.get("access_token");
+      let headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + access_token,
+      }
+      // Send login request
+      const response = await axios.post(`${config.API_URL}checkout/update-contact-information`, values, { headers: headers });
+      toast.success(response.data.message);
+      onCloseActive()
+      
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+    setIsLoading(false);
+  };
+
   const renderAccount = () => {
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
@@ -64,8 +146,8 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
               </svg>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">Enrico Smith</span>
-              <span className="ml-3 tracking-tighter">+855 - 666 - 7744</span>
+              <span className="">{userName}</span>
+              <span className="ml-3 tracking-tighter">{userPhone}</span>
             </div>
           </div>
           <button
@@ -82,20 +164,47 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
         >
           <div className="flex justify-between flex-wrap items-baseline">
             <h3 className="text-lg font-semibold">Contact infomation</h3>
+            {!isLoggedIn ? (
             <span className="block text-sm my-1 md:my-0">
               Do not have an account?{` `}
-              <a href="##" className="text-primary-500 font-medium">
+              <Link href="/login" className="text-primary-500 font-medium">
                 Log in
-              </a>
+              </Link>
             </span>
+            ) : (
+              <></>
+            )}
           </div>
+          <form onSubmit={formik.handleSubmit} className="grid grid-cols-1 gap-6">
           <div className="max-w-lg">
             <Label className="text-sm">Your phone number</Label>
-            <Input className="mt-1.5" defaultValue={"+808 xxx"} type={"tel"} />
+            
+            <Input
+                type="tel"
+                id="phone"
+                name="phone"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.phone}
+              />
+              {formik.touched.phone && formik.errors.phone && (
+                <div>{formik.errors.phone}</div>
+              )}
+
           </div>
           <div className="max-w-lg">
             <Label className="text-sm">Email address</Label>
-            <Input className="mt-1.5" type={"email"} />
+            <Input
+                type="email"
+                id="email"
+                name="email"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.email}
+              />
+              {formik.touched.email && formik.errors.email && (
+                <div>{formik.errors.email}</div>
+              )}
           </div>
           <div>
             <Checkbox
@@ -110,9 +219,10 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
           <div className="flex flex-col sm:flex-row pt-6">
             <ButtonPrimary
               className="sm:!px-7 shadow-none"
-              onClick={() => onCloseActive()}
+              type="submit"
+              disabled={isLoading}
             >
-              Save and next to Shipping
+              {isLoading ? 'Loading...' : 'Save and next to Shipping'}
             </ButtonPrimary>
             <ButtonSecondary
               className="mt-3 sm:mt-0 sm:ml-3"
@@ -121,6 +231,7 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
               Cancel
             </ButtonSecondary>
           </div>
+          </form>
         </div>
       </div>
     );

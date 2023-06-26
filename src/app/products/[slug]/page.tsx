@@ -1,18 +1,11 @@
 "use client";
 
-import React, { FC, useState } from "react";
+import React, { useState, useEffect } from "react";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/components/LikeButton";
 import { StarIcon } from "@heroicons/react/24/solid";
 import BagIcon from "@/components/BagIcon";
 import NcInputNumber from "@/components/NcInputNumber";
-import { PRODUCTS } from "@/data/data";
-import {
-  NoSymbolIcon,
-  ClockIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/outline";
-import IconDiscount from "@/components/IconDiscount";
 import Prices from "@/components/Prices";
 import toast from "react-hot-toast";
 import SectionSliderProductCard from "@/components/SectionSliderProductCard";
@@ -23,199 +16,128 @@ import Policy from "./Policy";
 import ReviewItem from "@/components/ReviewItem";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import ModalViewAllReviews from "./ModalViewAllReviews";
-import NotifyAddTocart from "@/components/NotifyAddTocart";
+import AddToCartNotify from "@/components/AddToCartNotify";
+
 import Image from "next/image";
 import AccordionInfo from "@/components/AccordionInfo";
 import { usePathname } from 'next/navigation'
+import config from '../../../custom/config';
+import axios from 'axios';
+import ProductBadge from "../../../components/ProductBadge";
+import ProductColor from "../../../components/ProductColor";
+import ProductSize from "../../../components/ProductSize";
+import Cookies from "js-cookie";
 
 const LIST_IMAGES_DEMO = [detail1JPG, detail2JPG, detail3JPG];
 
 const ProductDetailPage = () => {
-  const { sizes, variants, status, allOfSizes, image } = PRODUCTS[0];
   
-  const [variantActive, setVariantActive] = useState(0);
-  const [sizeSelected, setSizeSelected] = useState(sizes ? sizes[0] : "");
   const [qualitySelected, setQualitySelected] = useState(1);
   const [isOpenModalViewAllReviews, setIsOpenModalViewAllReviews] =
     useState(false);
 
+  const [data, setData] = useState({
+    name:"",
+    price:0,
+    description:"",
+    api_colors:[],
+    api_sizes:[],
+    badge:"",
+    image:"http://127.0.0.1:8000/uploads/test-product-1687319704.png",
+    rating:"",
+    id:"",
+    slug:"",
+    numberOfReviews:""
+  })
+  const [isLoading, setLoading] = useState(false)
+
   const pathname = usePathname()
   const slug = pathname.split("/").at(-1);
-  console.log(slug)
+  
+  useEffect(() => {
+    attempt(slug)
+  }, [])
 
-  //
-  const notifyAddTocart = () => {
+  const attempt = async (slug: any) => {
+    try {
+      setLoading(true)
+      // Send login request
+      const response = await axios.get(`${config.API_URL}products/${slug}`);
+      setData(response.data);
+      //console.log(response.data);
+    } catch (error: any) {
+      console.error(error);
+    }
+    setLoading(true)
+  }
+  
+  const notifyAddTocart = (data:any) => {
     toast.custom(
       (t) => (
-        <NotifyAddTocart
-          productImage={image}
-          qualitySelected={qualitySelected}
-          show={t.visible}
-          sizeSelected={sizeSelected}
-          variantActive={variantActive}
+        <AddToCartNotify
+          data={data}
         />
       ),
       { position: "top-right", id: "nc-product-notify", duration: 3000 }
     );
   };
 
-  const renderVariants = () => {
-    if (!variants || !variants.length) {
-      return null;
-    }
+  const addToCart = () => {
+    /*console.log('image:' + data.image);
+    console.log('qualitySelected:' + qualitySelected);
+    console.log('sizeSelected:' + sizeSelected);
+    console.log('variantActive:' + variantActive);*/
 
-    return (
-      <div>
-        <label htmlFor="">
-          <span className="text-sm font-medium">
-            Color:
-            <span className="ml-1 font-semibold">
-              {variants[variantActive].name}
-            </span>
-          </span>
-        </label>
-        <div className="flex mt-3">
-          {variants.map((variant, index) => (
-            <div
-              key={index}
-              onClick={() => setVariantActive(index)}
-              className={`relative flex-1 max-w-[75px] h-10 sm:h-11 rounded-full border-2 cursor-pointer ${
-                variantActive === index
-                  ? "border-primary-6000 dark:border-primary-500"
-                  : "border-transparent"
-              }`}
-            >
-              <div
-                className="absolute inset-0.5 rounded-full overflow-hidden z-0 object-cover bg-cover"
-                style={{
-                  backgroundImage: `url(${
-                    // @ts-ignore
-                    typeof variant.thumbnail?.src === "string"
-                      ? // @ts-ignore
-                        variant.thumbnail?.src
-                      : typeof variant.thumbnail === "string"
-                      ? variant.thumbnail
-                      : ""
-                  })`,
-                }}
-              ></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    const access_token = Cookies.get("access_token");
+    if(!access_token)
+    {
+      toast.error('Please login first');
+    }
+    else
+    {
+      attemptAddToCart(access_token);
+      //notifyAddTocart();
+    }
   };
 
-  const renderSizeList = () => {
-    if (!allOfSizes || !sizes || !sizes.length) {
-      return null;
+  const attemptAddToCart = async (access_token: String) => {
+    let add_to_cart_data = {
+      productId: data.id,
+      quantity: qualitySelected
     }
-    return (
-      <div>
-        <div className="flex justify-between font-medium text-sm">
-          <label htmlFor="">
-            <span className="">
-              Size:
-              <span className="ml-1 font-semibold">{sizeSelected}</span>
-            </span>
-          </label>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="##"
-            className="text-primary-6000 hover:text-primary-500"
-          >
-            See sizing chart
-          </a>
-        </div>
-        <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3">
-          {allOfSizes.map((size, index) => {
-            const isActive = size === sizeSelected;
-            const sizeOutStock = !sizes.includes(size);
-            return (
-              <div
-                key={index}
-                className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
-                  sizeOutStock
-                    ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
-                    : "cursor-pointer"
-                } ${
-                  isActive
-                    ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
-                    : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-                }`}
-                onClick={() => {
-                  if (sizeOutStock) {
-                    return;
-                  }
-                  setSizeSelected(size);
-                }}
-              >
-                {size}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  const renderStatus = () => {
-    if (!status) {
-      return null;
+    
+    let headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + access_token,
     }
-    const CLASSES =
-      "absolute top-3 left-3 px-2.5 py-1.5 text-xs bg-white dark:bg-slate-900 nc-shadow-lg rounded-full flex items-center justify-center text-slate-700 text-slate-900 dark:text-slate-300";
-    if (status === "New in") {
-      return (
-        <div className={CLASSES}>
-          <SparklesIcon className="w-3.5 h-3.5" />
-          <span className="ml-1 leading-none">{status}</span>
-        </div>
-      );
-    }
-    if (status === "50% Discount") {
-      return (
-        <div className={CLASSES}>
-          <IconDiscount className="w-3.5 h-3.5" />
-          <span className="ml-1 leading-none">{status}</span>
-        </div>
-      );
-    }
-    if (status === "Sold Out") {
-      return (
-        <div className={CLASSES}>
-          <NoSymbolIcon className="w-3.5 h-3.5" />
-          <span className="ml-1 leading-none">{status}</span>
-        </div>
-      );
-    }
-    if (status === "limited edition") {
-      return (
-        <div className={CLASSES}>
-          <ClockIcon className="w-3.5 h-3.5" />
-          <span className="ml-1 leading-none">{status}</span>
-        </div>
-      );
-    }
-    return null;
+    await axios.post(`${config.API_URL}cart/add`, add_to_cart_data, { headers: headers })
+      .then((response)=>{
+        let cart_added = response.data;
+        let current = response.data.current;
+        let all = response.data.all;
+        console.log(response.data);
+        notifyAddTocart(current);
+      }).catch((error) =>  {
+        toast.error(error.response.data.message);
+      });
+    
   };
 
   const renderSectionContent = () => {
+    
     return (
       <div className="space-y-7 2xl:space-y-8">
         {/* ---------- 1 HEADING ----------  */}
         <div>
           <h2 className="text-2xl sm:text-3xl font-semibold">
-            Heavy Weight Shoes
+            {data.name}
           </h2>
 
           <div className="flex items-center mt-5 space-x-4 sm:space-x-5">
             {/* <div className="flex text-xl font-semibold">$112.00</div> */}
             <Prices
               contentClass="py-1 px-2 md:py-1.5 md:px-3 text-lg font-semibold"
-              price={112}
+              price={data.price}
             />
 
             <div className="h-7 border-l border-slate-300 dark:border-slate-700"></div>
@@ -234,18 +156,16 @@ const ProductDetailPage = () => {
                   </span>
                 </div>
               </a>
-              <span className="hidden sm:block mx-2.5">·</span>
-              <div className="hidden sm:flex items-center text-sm">
-                <SparklesIcon className="w-3.5 h-3.5" />
-                <span className="ml-1 leading-none">{status}</span>
-              </div>
             </div>
           </div>
         </div>
 
         {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
-        <div className="">{renderVariants()}</div>
-        <div className="">{renderSizeList()}</div>
+        
+        
+        <div><ProductColor colors={data.api_colors} /></div>
+        <div><ProductSize sizes={data.api_sizes} /></div>
+       
 
         {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
         <div className="flex space-x-3.5">
@@ -257,7 +177,7 @@ const ProductDetailPage = () => {
           </div>
           <ButtonPrimary
             className="flex-1 flex-shrink-0"
-            onClick={notifyAddTocart}
+            onClick={addToCart}
           >
             <BagIcon className="hidden sm:inline-block w-5 h-5 mb-0.5" />
             <span className="ml-3">Add to cart</span>
@@ -363,6 +283,7 @@ const ProductDetailPage = () => {
   };
 
   return (
+    
     <div className={`nc-ProductDetailPage `}>
       {/* MAIn */}
       <main className="container mt-5 lg:mt-11">
@@ -375,12 +296,12 @@ const ProductDetailPage = () => {
                 <Image
                   fill
                   sizes="(max-width: 640px) 100vw, 33vw"
-                  src={LIST_IMAGES_DEMO[0]}
+                  src={data.image}
                   className="w-full rounded-2xl object-cover"
                   alt="product detail 1"
                 />
               </div>
-              {renderStatus()}
+              <ProductBadge badge={data.badge} />
               {/* META FAVORITES */}
               <LikeButton className="absolute right-3 top-3 " />
             </div>

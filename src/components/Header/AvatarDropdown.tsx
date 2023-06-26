@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Popover, Transition } from "@/app/headlessui";
 import { avatarImgs } from "@/contains/fakeData";
 import { Fragment } from "react";
@@ -12,6 +12,8 @@ export default function AvatarDropdown(props: any) {
   const handleLogout =  () => {
     Cookies.remove("isLoggedIn");
     Cookies.remove("name");
+    Cookies.remove("phone");
+    Cookies.remove("email");
     Cookies.remove("access_token");
     window.location.replace("/");
   };

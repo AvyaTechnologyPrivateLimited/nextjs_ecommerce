@@ -20,7 +20,7 @@ const ProductBadge: FC<Props> = ({
     return (
       <div className={CLASSES}>
         <SparklesIcon className="w-3.5 h-3.5" />
-        <span className="ml-1 leading-none">{status}</span>
+        <span className="ml-1 leading-none">{badge}</span>
       </div>
     );
 };

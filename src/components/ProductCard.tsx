@@ -44,7 +44,8 @@ const ProductCard: FC<ProductCardProps> = ({
     slug,
     numberOfReviews,
   } = data;
-  const product_slug = `products/${slug}`;
+  
+  const product_slug = `/products/${slug}`
 
   const [showModalQuickView, setShowModalQuickView] = useState(false);
   const router = useRouter();
@@ -157,10 +158,10 @@ const ProductCard: FC<ProductCardProps> = ({
       <div
         className={`nc-ProductCard relative flex flex-col bg-transparent ${className}`}
       >
-        <Link href={product_slug} className="absolute inset-0"></Link>
+        <Link href={`/products/${slug}`} className="absolute inset-0"></Link>
 
         <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden z-1 group">
-          <Link href={product_slug} className="block">
+          <Link href={`/products/${slug}`} className="block">
             <NcImage
               containerClassName="flex aspect-w-11 aspect-h-12 w-full h-0"
               src={image}

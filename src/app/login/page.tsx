@@ -45,6 +45,8 @@ const PageLogin = () => {
 
       Cookies.set("isLoggedIn", String(true));
       Cookies.set("name",login_data.name);
+      Cookies.set("phone",login_data.phone);
+      Cookies.set("email",login_data.email);
       Cookies.set("access_token",login_data.access_token);
 
       toast.success(login_data.message);

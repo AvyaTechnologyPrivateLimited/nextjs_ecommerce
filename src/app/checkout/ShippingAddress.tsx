@@ -1,12 +1,42 @@
 "use client";
 
 import Label from "@/components/Label/Label";
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import Input from "@/shared/Input/Input";
 import Radio from "@/shared/Radio/Radio";
 import Select from "@/shared/Select/Select";
+
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import config from '../../custom/config';
+import axios from 'axios';
+import toast from "react-hot-toast";
+import Cookies from "js-cookie";
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+            .required('Name is required')
+            .max(30, 'Max value should be 30 digits.'),
+  
+  address_1: Yup.string()
+            .required('Address is required')
+            .max(80, 'Max value should be 80 digits.'),
+  
+  city: Yup.string()
+            .required('City is required')
+            .max(40, 'Max value should be 40 digits.'),
+  
+  country: Yup.number()
+            .required('Country is required'),
+
+  state: Yup.string()
+            .required('State is required'),
+
+  postal_code: Yup.string()
+            .required('Postal Code is required'),
+});
 
 interface Props {
   isActive: boolean;
@@ -19,6 +49,81 @@ const ShippingAddress: FC<Props> = ({
   onCloseActive,
   onOpenActive,
 }) => {
+
+  const [countries, setCountries] = useState([])
+  const [isLoading, setIsLoading] = useState(false);
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      address_1: '',
+      address_2: '',
+      city: '',
+      country: '',
+      state: '',
+      postal_code: '',
+      address_type: ''
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      // Handle form submission
+      //console.log(values);
+      setIsLoading(true);
+
+      attempt(values);
+
+    }
+  });
+
+  const getCountries = async () => {
+    const access_token1 = Cookies.get("access_token");
+    if(!access_token1)
+    {
+      //toast.error('Please login first');
+      console.log('you are not loggedin');
+    }
+    else
+    {
+      let headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + access_token1,
+      }
+      await axios.get(`${config.API_URL}checkout/countries`, { headers: headers })
+        .then((response)=>{
+          setCountries(response.data);
+        }).catch((error) =>  {
+          console.error(`Login to get cart ${error}`);
+        });
+    }
+  };
+
+  useEffect(() => {
+    //getCountries();
+  }, [])
+
+  const attempt = async (values: any) => {
+    try {
+      const access_token = Cookies.get("access_token");
+      let headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + access_token,
+      }
+      // Send login request
+      const response = await axios.post(`${config.API_URL}checkout/update-shipping-address`, values, { headers: headers });
+      toast.success(response.data.message);
+      onCloseActive()
+      
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+    setIsLoading(false);
+  };
+
+  const renderCountryOption = (country:any) => {
+    return (
+      <option key={country.id} value={country.id}>{country.name}</option>
+    )
+  }
+
   const renderShippingAddress = () => {
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
@@ -104,31 +209,55 @@ const ShippingAddress: FC<Props> = ({
           }`}
         >
           {/* ============ */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-            <div>
-              <Label className="text-sm">First name</Label>
-              <Input className="mt-1.5" defaultValue="Cole" />
-            </div>
-            <div>
-              <Label className="text-sm">Last name</Label>
-              <Input className="mt-1.5" defaultValue="Enrico " />
-            </div>
+          <form onSubmit={formik.handleSubmit} className="grid grid-cols-1 gap-6">
+
+          <div className="max-w-lg">
+            <Label className="text-sm">Name</Label>
+            
+            <Input
+                type="text"
+                id="name"
+                name="name"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.name}
+              />
+              {formik.touched.name && formik.errors.name && (
+                <div>{formik.errors.name}</div>
+              )}
+
           </div>
 
           {/* ============ */}
           <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
             <div className="flex-1">
               <Label className="text-sm">Address</Label>
+            
               <Input
-                className="mt-1.5"
-                placeholder=""
-                defaultValue={"123, Dream Avenue, USA"}
-                type={"text"}
-              />
+                  type="text"
+                  id="address_1"
+                  name="address_1"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.address_1}
+                />
+                {formik.touched.address_1 && formik.errors.address_1 && (
+                  <div>{formik.errors.address_1}</div>
+                )}
             </div>
             <div className="sm:w-1/3">
               <Label className="text-sm">Apt, Suite *</Label>
-              <Input className="mt-1.5" defaultValue="55U - DD5 " />
+              <Input
+                  type="text"
+                  id="address_2"
+                  name="address_2"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.address_2}
+                />
+                {formik.touched.address_2 && formik.errors.address_2 && (
+                  <div>{formik.errors.address_2}</div>
+                )}
             </div>
           </div>
 
@@ -136,20 +265,28 @@ const ShippingAddress: FC<Props> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
               <Label className="text-sm">City</Label>
-              <Input className="mt-1.5" defaultValue="Norris" />
+              <Input
+                  type="text"
+                  id="city"
+                  name="city"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.city}
+                />
+                {formik.touched.city && formik.errors.city && (
+                  <div>{formik.errors.city}</div>
+                )}
             </div>
             <div>
               <Label className="text-sm">Country</Label>
               <Select className="mt-1.5" defaultValue="United States ">
                 <option value="United States">United States</option>
-                <option value="United States">Canada</option>
-                <option value="United States">Mexico</option>
-                <option value="United States">Israel</option>
-                <option value="United States">France</option>
-                <option value="United States">England</option>
-                <option value="United States">Laos</option>
-                <option value="United States">China</option>
               </Select>
+
+              <Select name="country" as="select" className="my-select">
+                {countries.map(renderCountryOption)}
+              </Select>
+
             </div>
           </div>
 
@@ -157,11 +294,31 @@ const ShippingAddress: FC<Props> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
               <Label className="text-sm">State/Province</Label>
-              <Input className="mt-1.5" defaultValue="Texas" />
+              <Input
+                  type="text"
+                  id="state"
+                  name="state"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.state}
+                />
+                {formik.touched.state && formik.errors.state && (
+                  <div>{formik.errors.state}</div>
+                )}
             </div>
             <div>
               <Label className="text-sm">Postal code</Label>
-              <Input className="mt-1.5" defaultValue="2500 " />
+              <Input
+                  type="text"
+                  id="postal_code"
+                  name="postal_code"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.postal_code}
+                />
+                {formik.touched.postal_code && formik.errors.postal_code && (
+                  <div>{formik.errors.postal_code}</div>
+                )}
             </div>
           </div>
 
@@ -185,11 +342,12 @@ const ShippingAddress: FC<Props> = ({
 
           {/* ============ */}
           <div className="flex flex-col sm:flex-row pt-6">
-            <ButtonPrimary
+          <ButtonPrimary
               className="sm:!px-7 shadow-none"
-              onClick={onCloseActive}
+              type="submit"
+              disabled={isLoading}
             >
-              Save and next to Payment
+              {isLoading ? 'Loading...' : 'Save and next to Payment'}
             </ButtonPrimary>
             <ButtonSecondary
               className="mt-3 sm:mt-0 sm:ml-3"
@@ -198,6 +356,7 @@ const ShippingAddress: FC<Props> = ({
               Cancel
             </ButtonSecondary>
           </div>
+          </form>
         </div>
       </div>
     );
