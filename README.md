@@ -25,4 +25,5 @@ NEXT_PUBLIC_SERVER_API_URL=https://av-ecom-cms.avdemosites.com/api
 Note: You should change api path as per your system.
 
 `Step 3` Once the installation is completed successfully without errors you can run the template with command `npm run dev`.
+
 `Step 4` Open the browser in the next URL: localhost:3000
