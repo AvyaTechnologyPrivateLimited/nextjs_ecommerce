@@ -1,4 +1,4 @@
-![Logo](https://www.avyatech.com/wp-content/uploads/2018/05/logo.svg)
+<p align="center"><a href="https://avyatech.com" target="_blank"><img src="https://www.avyatech.com/wp-content/uploads/2018/05/logo.svg" width="200" alt="Avya Logo"></a></p>
 
 ## 🚀 Av Demo Ecom
 This is an ecommerce demo app, developed by Avya Tech Pvt. Ltd.
