@@ -21,13 +21,13 @@ const DATA_sortOrderRadios = [
   { name: "Price Hight - Low", id: "Price-hight-low" },
 ];
 
-const PRICE_RANGE = [1, 500];
+const PRICE_RANGE = [1, 5000];
 //
-const TabFilters = () => {
+const TabFilters = ({getFilteredData}:any) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
   //
   const [isOnSale, setIsIsOnSale] = useState(false);
-  const [rangePrices, setRangePrices] = useState([100, 500]);
+  const [rangePrices, setRangePrices] = useState(PRICE_RANGE);
   const [categoriesState, setCategoriesState] = useState<string[]>([]);
   const [colorsState, setColorsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
@@ -44,7 +44,6 @@ const TabFilters = () => {
         setCategories(data.filters.categories);
         setColors(data.filters.colors);
         setSizes(data.filters.sizes);
-        //console.log(data);
       } catch (error) {
         console.error('Error fetching filters:', error);
       }
@@ -60,7 +59,7 @@ const TabFilters = () => {
   const handleChangeCategories = (checked: boolean, name: string) => {
     checked
       ? setCategoriesState([...categoriesState, name])
-      : setCategoriesState(categoriesState.filter((i) => i !== name));
+      : setCategoriesState(categoriesState.filter((i) => i !== name));      
   };
 
   const handleChangeColors = (checked: boolean, name: string) => {
@@ -75,19 +74,31 @@ const TabFilters = () => {
       : setSizesState(sizesState.filter((i) => i !== name));
   };
 
+  const setFilteredData = () => {
+    let urlCat = categoriesState.length > 0 ? '&category='+categoriesState.toString() : '';
+    let urlColor = colorsState.length > 0 ? '&color='+colorsState.toString() : '';
+    let urlSize = sizesState.length > 0 ? '&sizes='+sizesState.toString() : '';
+    let urlPrice = rangePrices.length > 0 ? '&price='+rangePrices.toString() : '';
+    getFilteredData(urlCat+urlColor+urlSize+urlPrice);
+
+  }
+
   //
 
   // OK
   const renderXClear = () => {
+
     return (
-      <span className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
+      <span onClick={() => {
+                        
+                      }} className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-3 w-3"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
-          <path
+          <path 
             fillRule="evenodd"
             d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
             clipRule="evenodd"
@@ -202,7 +213,7 @@ const TabFilters = () => {
                         <Checkbox
                           name={item.name}
                           label={item.name}
-                          defaultChecked={categoriesState.includes(item.name)}
+                          defaultChecked={categoriesState.includes(item.slug)}
                           onChange={(checked) =>
                             handleChangeCategories(checked, item.slug)
                           }
@@ -213,15 +224,19 @@ const TabFilters = () => {
                   <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
                     <ButtonThird
                       onClick={() => {
-                        close();
                         setCategoriesState([]);
+                        setFilteredData();
+                        close();
                       }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        setFilteredData();
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -337,13 +352,17 @@ const TabFilters = () => {
                       onClick={() => {
                         close();
                         setSortOrderStates("");
+                        setFilteredData();
                       }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        setFilteredData();
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -458,13 +477,17 @@ const TabFilters = () => {
                       onClick={() => {
                         close();
                         setColorsState([]);
+                        setFilteredData();
                       }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        setFilteredData();
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -568,13 +591,17 @@ const TabFilters = () => {
                       onClick={() => {
                         close();
                         setSizesState([]);
+                        setFilteredData();
                       }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        setFilteredData();
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -718,7 +745,10 @@ const TabFilters = () => {
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        setFilteredData();
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply

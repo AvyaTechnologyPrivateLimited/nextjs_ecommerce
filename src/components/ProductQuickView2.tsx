@@ -290,7 +290,7 @@ const ProductQuickView2: FC<ProductQuickView2Props> = ({ className = "" }) => {
             {/* STATUS */}
             {renderStatus()}
             {/* META FAVORITES */}
-            <LikeButton className="absolute right-3 top-3 " />
+            <LikeButton liked={false} productid={1} className="absolute right-3 top-3 " />
           </div>
         </div>
 

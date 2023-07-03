@@ -1,27 +1,55 @@
 "use client";
-
+import Cookies from "js-cookie";
+import config from '../custom/config';
+import axios from 'axios'; 
+import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 
 export interface LikeButtonProps {
   className?: string;
   liked?: boolean;
+  productid:any;
 }
 
 const LikeButton: React.FC<LikeButtonProps> = ({
   className = "",
   liked = false,
+  productid
 }) => {
   const [isLiked, setIsLiked] = useState(liked);
 
   // make random for demo
   useEffect(() => {
-    setIsLiked(Math.random() > 0.5);
+    setIsLiked(isLiked);
   }, []);
+
+  const addToWishlist = async (productid:any) => {
+    if(Cookies.get("access_token"))
+    {
+      try {
+        let headers = {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + Cookies.get("access_token"),
+        }
+        const response = await axios.post(`${config.API_URL}wishlist/toggle`, {productid:productid}, { headers: headers });
+        const data = await response.data;
+        console.log(data.wishlisted);
+        setIsLiked(data.wishlisted);
+        toast.success(data.message);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    }
+    else
+    {
+      alert('Login first to add this product into wishlist');
+    }
+  };
 
   return (
     <button
       className={`w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-900 text-neutral-700 dark:text-slate-200 nc-shadow-lg ${className}`}
-      onClick={() => setIsLiked(!isLiked)}
+      onClick={() => addToWishlist(productid)}
     >
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
         <path

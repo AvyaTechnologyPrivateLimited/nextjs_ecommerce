@@ -18,6 +18,14 @@ const HeaderFilterSection: FC<HeaderFilterSectionProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [tabActive, setTabActive] = useState("All items");
+  
+  const [filtersData, setFiltersData] = useState([]);
+
+  const getFilteredData = (filtersData:any) => {
+    //setFiltersData(filtersData);
+    
+    //console.log(filtersData);
+  };
 
   return (
     <div className={`flex flex-col relative ${className}`}>
@@ -93,7 +101,7 @@ const HeaderFilterSection: FC<HeaderFilterSectionProps> = ({
         leaveTo="opacity-0"
       >
         <div className="w-full border-b border-neutral-200 dark:border-neutral-700 my-8"></div>
-        <TabFilters />
+        <TabFilters getFilteredData={getFilteredData} />
       </Transition>
     </div>
   );

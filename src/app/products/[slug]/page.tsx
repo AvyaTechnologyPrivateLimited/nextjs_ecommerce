@@ -51,11 +51,18 @@ const ProductDetailPage = () => {
   })
   const [isLoading, setLoading] = useState(false)
 
-  const pathname = usePathname()
-  const slug = pathname.split("/").at(-1);
+  
+
+
   
   useEffect(() => {
-    attempt(slug)
+    const pathname = usePathname();
+
+    if(pathname && Array.isArray(pathname)) {
+      const slug = pathname.split("/").at(-1);
+      attempt(slug)
+    } 
+    
   }, [])
 
   const attempt = async (slug: any) => {
@@ -303,7 +310,7 @@ const ProductDetailPage = () => {
               </div>
               <ProductBadge badge={data.badge} />
               {/* META FAVORITES */}
-              <LikeButton className="absolute right-3 top-3 " />
+              <LikeButton liked={false} productid={1} className="absolute right-3 top-3 " />
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-8 xl:mt-8">
               {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {

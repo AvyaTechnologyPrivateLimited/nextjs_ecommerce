@@ -90,6 +90,7 @@ const ShippingAddress: FC<Props> = ({
       await axios.get(`${config.API_URL}checkout/countries`, { headers: headers })
         .then((response)=>{
           setCountries(response.data);
+          setIsLoading(false);
         }).catch((error) =>  {
           console.error(`Login to get cart ${error}`);
         });
@@ -97,7 +98,7 @@ const ShippingAddress: FC<Props> = ({
   };
 
   useEffect(() => {
-    //getCountries();
+    getCountries();
   }, [])
 
   const attempt = async (values: any) => {
@@ -279,12 +280,9 @@ const ShippingAddress: FC<Props> = ({
             </div>
             <div>
               <Label className="text-sm">Country</Label>
-              <Select className="mt-1.5" defaultValue="United States ">
-                <option value="United States">United States</option>
-              </Select>
 
-              <Select name="country" as="select" className="my-select">
-                {countries.map(renderCountryOption)}
+              <Select name="country" className="my-select">
+                {!isLoading ? countries.map(renderCountryOption) : null}
               </Select>
 
             </div>
