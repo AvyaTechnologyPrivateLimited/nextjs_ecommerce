@@ -74,7 +74,7 @@ const PageLogin = () => {
           <form onSubmit={formik.handleSubmit} className="grid grid-cols-1 gap-6">
             <label className="block">
               <span className="text-neutral-800 dark:text-neutral-200">
-                Email address 2
+                Email address 3
               </span>
               <Input
                 type="email"
