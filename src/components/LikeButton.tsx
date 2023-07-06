@@ -8,13 +8,13 @@ import React, { useEffect, useState } from "react";
 export interface LikeButtonProps {
   className?: string;
   liked?: boolean;
-  productid:any;
+  productid?:any;
 }
 
 const LikeButton: React.FC<LikeButtonProps> = ({
   className = "",
   liked = false,
-  productid
+  productid = 1
 }) => {
   const [isLiked, setIsLiked] = useState(liked);
 

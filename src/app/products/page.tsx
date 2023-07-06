@@ -7,7 +7,6 @@ import ProductCard from "@/components/ProductCard";
 import TabFilters from "@/components/TabFilters";
 import config from '../../custom/config';
 import axios from 'axios'; 
-import { redirect } from 'next/navigation'
 import Cookies from "js-cookie";
 
 const PageCollection = () => {
@@ -38,7 +37,7 @@ const PageCollection = () => {
       setCurrentPage(data.current_page);
       setLastPage(data.last_page);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      //console.error('Error fetching products:', error);
     }
   };
 
@@ -71,7 +70,7 @@ const PageCollection = () => {
     const pageNumbers = [];
 
     pageNumbers.push(
-        <button onClick={prevPage}
+        <button key="pre" onClick={prevPage}
           className="inline-flex w-11 h-11 items-center justify-center rounded-full border border-neutral-200 text-neutral-6000 dark:bg-neutral-900">
           Pre
         </button>
@@ -93,7 +92,7 @@ const PageCollection = () => {
     }
 
     pageNumbers.push(
-      <button  onClick={nextPage}
+      <button key="next"  onClick={nextPage}
         className="inline-flex w-11 h-11 items-center justify-center rounded-full border border-neutral-200 text-neutral-6000 dark:bg-neutral-900">
         Next
       </button>

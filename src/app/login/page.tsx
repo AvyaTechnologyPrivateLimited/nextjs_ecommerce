@@ -2,7 +2,6 @@
 import Input from "@/shared/Input/Input";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { toast, ToastContainer } from 'react-toastify';
 import Link from "next/link";
 import axios from 'axios';
 import LoginWithSocial from "../../components/LoginWithSocial";
@@ -10,6 +9,7 @@ import React, { useState } from "react";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import config from '../../custom/config';
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -59,8 +59,6 @@ const PageLogin = () => {
   };
 
   return (
-    <>
-      <ToastContainer />
       <div className={`nc-PageLogin`} data-nc-id="PageLogin">
       <div className="container mb-24 lg:mb-32">
         <h2 className="my-20 flex items-center text-3xl leading-[115%] md:text-5xl md:leading-[115%] font-semibold text-neutral-900 dark:text-neutral-100 justify-center">
@@ -127,7 +125,6 @@ const PageLogin = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

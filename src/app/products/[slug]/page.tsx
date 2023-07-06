@@ -19,7 +19,7 @@ import ModalViewAllReviews from "./ModalViewAllReviews";
 import AddToCartNotify from "@/components/AddToCartNotify";
 
 import Image from "next/image";
-import AccordionInfo from "@/components/AccordionInfo";
+import ProductAccordion from "@/components/ProductAccordion";
 import { usePathname } from 'next/navigation'
 import config from '../../../custom/config';
 import axios from 'axios';
@@ -40,26 +40,25 @@ const ProductDetailPage = () => {
     name:"",
     price:0,
     description:"",
+    features:"",
+    product_details:"",
     api_colors:[],
     api_sizes:[],
     badge:"",
-    image:"http://127.0.0.1:8000/uploads/test-product-1687319704.png",
+    image:"https://av-ecom-cms.avdemosites.com/uploads/shirt-2-1688117284.png",
     rating:"",
     id:"",
     slug:"",
-    numberOfReviews:""
+    wishlist: false,
+    numberOfReviews:"",
   })
   const [isLoading, setLoading] = useState(false)
-
-  
-
-
-  
+  const [descData, setDescData] = useState([{}])
+  const pathname = usePathname();
   useEffect(() => {
-    const pathname = usePathname();
-
-    if(pathname && Array.isArray(pathname)) {
+    if(pathname) {
       const slug = pathname.split("/").at(-1);
+      console.log(slug);
       attempt(slug)
     } 
     
@@ -67,15 +66,30 @@ const ProductDetailPage = () => {
 
   const attempt = async (slug: any) => {
     try {
+      let headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + Cookies.get("access_token"),
+      }
       setLoading(true)
       // Send login request
-      const response = await axios.get(`${config.API_URL}products/${slug}`);
+      const response = await axios.get(`${config.API_URL}products/${slug}`, { headers: headers });
+      response.data.wishlist = response.data.wishlist ? true :false;
+      response.data.image = "https://av-ecom-cms.avdemosites.com/uploads/shirt-2-1688117284.png";
       setData(response.data);
-      //console.log(response.data);
+      setDescData([
+        {
+          name: "Description",
+          content: response.data.description,
+        },
+        {
+          name: "Features",
+          content: response.data.features
+        }
+      ]);
     } catch (error: any) {
       console.error(error);
     }
-    setLoading(true)
+    setLoading(false)
   }
   
   const notifyAddTocart = (data:any) => {
@@ -196,7 +210,7 @@ const ProductDetailPage = () => {
         {/*  */}
 
         {/* ---------- 5 ----------  */}
-        <AccordionInfo />
+        <ProductAccordion data={descData} />
 
         {/* ---------- 6 ----------  */}
         <div className="hidden xl:block">
@@ -210,28 +224,7 @@ const ProductDetailPage = () => {
     return (
       <div className="">
         <h2 className="text-2xl font-semibold">Product Details</h2>
-        <div className="prose prose-sm sm:prose dark:prose-invert sm:max-w-4xl mt-7">
-          <p>
-            The patented eighteen-inch hardwood Arrowhead deck --- finely
-            mortised in, makes this the strongest and most rigid canoe ever
-            built. You cannot buy a canoe that will afford greater satisfaction.
-          </p>
-          <p>
-            The St. Louis Meramec Canoe Company was founded by Alfred Wickett in
-            1922. Wickett had previously worked for the Old Town Canoe Co from
-            1900 to 1914. Manufacturing of the classic wooden canoes in Valley
-            Park, Missouri ceased in 1978.
-          </p>
-          <ul>
-            <li>Regular fit, mid-weight t-shirt</li>
-            <li>Natural color, 100% premium combed organic cotton</li>
-            <li>
-              Quality cotton grown without the use of herbicides or pesticides -
-              GOTS certified
-            </li>
-            <li>Soft touch water based printed in the USA</li>
-          </ul>
-        </div>
+        {data.product_details}
       </div>
     );
   };
@@ -310,7 +303,11 @@ const ProductDetailPage = () => {
               </div>
               <ProductBadge badge={data.badge} />
               {/* META FAVORITES */}
-              <LikeButton liked={false} productid={1} className="absolute right-3 top-3 " />
+
+              {(!isLoading ? 
+                <LikeButton liked={data.wishlist} productid={data.id} className="absolute right-3 top-3 " />
+              :null)}
+              
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-8 xl:mt-8">
               {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {

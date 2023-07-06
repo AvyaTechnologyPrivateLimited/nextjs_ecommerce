@@ -211,7 +211,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", data }) =
             {/* STATUS */}
             <ProductBadge badge={badge} />
             {/* META FAVORITES */}
-            <LikeButton liked={false} productid={1} className="absolute right-3 top-3 " />
+            <LikeButton className="absolute right-3 top-3 " />
           </div>
           <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
             {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {

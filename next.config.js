@@ -24,6 +24,12 @@ const nextConfig = {
         port: "8000",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "av-ecom-cms.avdemosites.com",
+        port: "8000",
+        pathname: "/**",
+      },
     ],
   },
 };
