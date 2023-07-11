@@ -1,23 +1,24 @@
 "use client";
 
+import { color } from "framer-motion";
 import React, { FC, useState } from "react";
 export interface ProductColorProps {
+  defaultValue?:String,
   colors: any[]
 }
 
 const ProductColor: FC<ProductColorProps> = ({
+  defaultValue,
   colors
 }) => {
 
-  const [variantActive, setVariantActive] = useState("");
-  
+  const [variantActive, setVariantActive] = useState(defaultValue);
   const getActiveColor = (color:any) => {
     
     return variantActive===color.name ? color.code : "#ffffff";
     
   };
 
-  
   if (!colors || !colors.length) {
     return null;
   }

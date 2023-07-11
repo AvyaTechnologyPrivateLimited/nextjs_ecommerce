@@ -42,7 +42,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     }
     else
     {
-      alert('Login first to add this product into wishlist');
+      toast.error('Login first to add this product into wishlist');
     }
   };
 

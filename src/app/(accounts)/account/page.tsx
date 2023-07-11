@@ -1,15 +1,110 @@
+"use client";
+
 import Label from "@/components/Label/Label";
-import React, { FC } from "react";
+import React, { FC , useEffect, useState } from "react";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import Input from "@/shared/Input/Input";
 import Select from "@/shared/Select/Select";
 import Textarea from "@/shared/Textarea/Textarea";
 import { avatarImgs } from "@/contains/fakeData";
 import Image from "next/image";
+import config from '../../../custom/config';
+import axios from 'axios'; 
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  name: Yup.string().required('Name is required'),
+  phone: Yup.number().required('Phone number is required').min(10, 'min 10 digit required')
+});
 
 const AccountPage = () => {
+
+  const [profileData, setProfileData] = useState(
+    {
+      name: "",
+      email:"",
+      phone: "",
+      dob: "",
+      gender: "",
+      address: "",
+      about_me: ""
+    }
+  );
+  const [file, setFile] = useState(avatarImgs[2]);
+
+  const formik = useFormik({
+    initialValues: profileData,
+    validationSchema,
+    onSubmit: (values) => {
+      // Handle form submission
+      //console.log(values);
+      //setIsLoading(true);
+
+      updateProfile();
+
+    }
+  });
+
+  // const handleChange = (event:any) => {
+  //   let value = event.target.value;
+  //   let name = event.target.name;
+ 
+  //   setProfileData((prevalue) => {
+  //     return {
+  //       ...prevalue,   // Spread Operator              
+  //       [name]: value
+  //     }
+  //   })
+  // }
+
+  function handleChangeFileUpload(e:any) {
+    //setFile(URL.createObjectURL(e.target.files[0]));
+  }
+
+  const fetchProfile = async () => {
+    try {
+      let headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + Cookies.get("access_token"),
+      }
+      const response = await axios.get(`${config.API_URL}user`, { headers: headers });
+      const data = await response.data;
+      setProfileData(data);
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
+
+  const updateProfile = async () => {
+    //event.preventDefault();
+    try {
+      let headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + Cookies.get("access_token"),
+      }
+      const response = await axios.post(`${config.API_URL}update-user`, profileData, { headers: headers });
+      const data = await response.data;
+      setProfileData(data.data);
+      toast.success(data.message);
+    } catch (error) {
+      console.error('Error fetching updated profile:', error);
+      //toast.error(data.message);
+    }
+  };
+
+  useEffect(() => {
+
+    fetchProfile();
+  }, []);
+
+
   return (
     <div className={`nc-AccountPage `}>
+      <form onSubmit={formik.handleSubmit}>
       <div className="space-y-10 sm:space-y-12">
         {/* HEADING */}
         <h2 className="text-2xl sm:text-3xl font-semibold">
@@ -20,7 +115,7 @@ const AccountPage = () => {
             {/* AVATAR */}
             <div className="relative rounded-full overflow-hidden flex">
               <Image
-                src={avatarImgs[2]}
+                src={file}
                 alt="avatar"
                 width={128}
                 height={128}
@@ -47,14 +142,31 @@ const AccountPage = () => {
               </div>
               <input
                 type="file"
+                name="file"
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
+
             </div>
           </div>
           <div className="flex-grow mt-10 md:mt-0 md:pl-16 max-w-3xl space-y-6">
             <div>
               <Label>Full name</Label>
-              <Input className="mt-1.5" defaultValue="Enrico Cole" />
+              <div className="mt-1.5 flex">
+                <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
+                  <i className="text-2xl las la-user"></i>
+                </span>
+                <Input 
+                  className="!rounded-l-none" 
+                  name="name"
+                  placeholder="Enter Your Full Name" 
+                  defaultValue={profileData.name} 
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+              </div>
+                {formik.touched.name && formik.errors.name && (
+                  <span className="text-danger">{formik.errors.name}</span>
+                )}
             </div>
 
             {/* ---- */}
@@ -68,13 +180,20 @@ const AccountPage = () => {
                 </span>
                 <Input
                   className="!rounded-l-none"
-                  placeholder="example@email.com"
+                  name="email"
+                  placeholder="Enter Your Email Address"
+                  defaultValue={profileData.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                 />
               </div>
+              {formik.touched.email && formik.errors.email && (
+                <span className="text-danger">{formik.errors.email}</span>
+              )}
             </div>
 
             {/* ---- */}
-            <div className="max-w-lg">
+            {/*<div className="max-w-lg">
               <Label>Date of birth</Label>
               <div className="mt-1.5 flex">
                 <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
@@ -83,10 +202,11 @@ const AccountPage = () => {
                 <Input
                   className="!rounded-l-none"
                   type="date"
-                  defaultValue="1990-07-22"
+                  onChange={handleChange}
+                  defaultValue={profileData.dob}
                 />
               </div>
-            </div>
+            </div>*/}
             {/* ---- */}
             <div>
               <Label>Addess</Label>
@@ -96,20 +216,23 @@ const AccountPage = () => {
                 </span>
                 <Input
                   className="!rounded-l-none"
-                  defaultValue="New york, USA"
+                  name="address"
+                  placeholder="Enter Your Address"
+                  onChange={formik.handleChange}
+                  defaultValue={profileData.address}
                 />
               </div>
             </div>
 
             {/* ---- */}
-            <div>
+            {/*<div>
               <Label>Gender</Label>
-              <Select className="mt-1.5">
+              <Select  value={profileData.gender} className="mt-1.5" onChange={handleChange}>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </Select>
-            </div>
+            </div>*/}
 
             {/* ---- */}
             <div>
@@ -118,20 +241,37 @@ const AccountPage = () => {
                 <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
                   <i className="text-2xl las la-phone-volume"></i>
                 </span>
-                <Input className="!rounded-l-none" defaultValue="003 888 232" />
+                <Input 
+                  className="!rounded-l-none" 
+                  name="phone"
+                  placeholder="Enter Your Phone Number"
+                  defaultValue={profileData.phone}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                
               </div>
+              {formik.touched.phone && formik.errors.phone && (
+                  <span className="text-danger">{formik.errors.phone}</span>
+                )}
             </div>
             {/* ---- */}
-            <div>
+            {/*<div>
               <Label>About you</Label>
-              <Textarea className="mt-1.5" defaultValue="..." />
-            </div>
+              <Textarea 
+                className="mt-1.5" 
+                onChange={handleChange}
+                placeholder="Detail About Me..." 
+                defaultValue={profileData.about_me} 
+              />
+            </div>*/}
             <div className="pt-2">
-              <ButtonPrimary>Update account</ButtonPrimary>
+              <ButtonPrimary type="submit" >Update account</ButtonPrimary>
             </div>
           </div>
         </div>
       </div>
+      </form>
     </div>
   );
 };

@@ -27,6 +27,7 @@ import ProductBadge from "../../../components/ProductBadge";
 import ProductColor from "../../../components/ProductColor";
 import ProductSize from "../../../components/ProductSize";
 import Cookies from "js-cookie";
+import ImagePlaceHolder from "@/images/products/placeholder.png";
 
 const LIST_IMAGES_DEMO = [detail1JPG, detail2JPG, detail3JPG];
 
@@ -45,14 +46,18 @@ const ProductDetailPage = () => {
     api_colors:[],
     api_sizes:[],
     badge:"",
-    image:"https://av-ecom-cms.avdemosites.com/uploads/shirt-2-1688117284.png",
+    image:ImagePlaceHolder,
     rating:"",
     id:"",
     slug:"",
     wishlist: false,
     numberOfReviews:"",
+    quantity:0
   })
   const [isLoading, setLoading] = useState(false)
+  const [defaultColor, setDefaultColor] = useState("")
+  const [defaultSize, setDefaultSize] = useState("")
+  
   const [descData, setDescData] = useState([{}])
   const pathname = usePathname();
   useEffect(() => {
@@ -63,7 +68,6 @@ const ProductDetailPage = () => {
     } 
     
   }, [])
-
   const attempt = async (slug: any) => {
     try {
       let headers = {
@@ -74,7 +78,18 @@ const ProductDetailPage = () => {
       // Send login request
       const response = await axios.get(`${config.API_URL}products/${slug}`, { headers: headers });
       response.data.wishlist = response.data.wishlist ? true :false;
-      response.data.image = "https://av-ecom-cms.avdemosites.com/uploads/shirt-2-1688117284.png";
+      let apicolors = response.data.api_colors;
+      if(apicolors.length>0)
+      {
+        setDefaultColor(apicolors[0].name);
+      }
+
+      let apisizes = response.data.api_sizes;
+      if(apisizes.length>0)
+      {
+        setDefaultSize(apisizes[0].name);
+      }
+
       setData(response.data);
       setDescData([
         {
@@ -86,6 +101,7 @@ const ProductDetailPage = () => {
           content: response.data.features
         }
       ]);
+      setLoading(false);
     } catch (error: any) {
       console.error(error);
     }
@@ -104,11 +120,6 @@ const ProductDetailPage = () => {
   };
 
   const addToCart = () => {
-    /*console.log('image:' + data.image);
-    console.log('qualitySelected:' + qualitySelected);
-    console.log('sizeSelected:' + sizeSelected);
-    console.log('variantActive:' + variantActive);*/
-
     const access_token = Cookies.get("access_token");
     if(!access_token)
     {
@@ -184,8 +195,17 @@ const ProductDetailPage = () => {
         {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
         
         
-        <div><ProductColor colors={data.api_colors} /></div>
-        <div><ProductSize sizes={data.api_sizes} /></div>
+        <div>
+        {(!isLoading ? 
+                <ProductColor defaultValue={defaultColor} colors={data.api_colors} />
+        :null)}
+          
+        </div>
+        <div>
+        {(!isLoading ? 
+          <ProductSize defaultValue={defaultSize} sizes={data.api_sizes} />
+        :null)}
+        </div>
        
 
         {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
@@ -194,6 +214,7 @@ const ProductDetailPage = () => {
             <NcInputNumber
               defaultValue={qualitySelected}
               onChange={setQualitySelected}
+              max={data.quantity}
             />
           </div>
           <ButtonPrimary
@@ -296,7 +317,7 @@ const ProductDetailPage = () => {
                 <Image
                   fill
                   sizes="(max-width: 640px) 100vw, 33vw"
-                  src={data.image}
+                  src="https://nextjs-ecom-laravel-10-api.bybotech.com/public/uploads/shirt-2-1688117284.png"
                   className="w-full rounded-2xl object-cover"
                   alt="product detail 1"
                 />

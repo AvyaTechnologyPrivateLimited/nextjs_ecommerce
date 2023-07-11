@@ -2,14 +2,16 @@
 
 import React, { FC, useState } from "react";
 export interface ProductSizeProps {
+  defaultValue?:String,
   sizes: any[]
 }
 
 const ProductSize: FC<ProductSizeProps> = ({
+  defaultValue,
   sizes
 }) => {
 
-  const [sizeSelected, setSizeSelected] = useState(0);
+  const [sizeSelected, setSizeSelected] = useState(defaultValue);
   
   if (!sizes || !sizes.length) {
     return null;

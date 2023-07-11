@@ -31,8 +31,8 @@ const pages: {
     link: "/account-password",
   },
   {
-    name: "Change Billing",
-    link: "/account-billing",
+    name: "Change Address",
+    link: "/account-address",
   },
 ];
 

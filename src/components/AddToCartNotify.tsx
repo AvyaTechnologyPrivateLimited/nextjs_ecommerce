@@ -3,6 +3,7 @@ import { Transition } from "@/app/headlessui";
 import Prices from "@/components/Prices";
 import Image from "next/image";
 import ColorAndSize from "@/components/ColorAndSize";
+import Link from "next/link";
 
 interface Props {
   data:any
@@ -42,12 +43,12 @@ const AddToCartNotify: FC<Props> = ({
             <p className="text-gray-500 dark:text-slate-400">{`Qty ${data.quantity}`}</p>
 
             <div className="flex">
-              <button
-                type="button"
+              <Link
+                href="/cart"
                 className="font-medium text-primary-6000 dark:text-primary-500 "
               >
                 View cart
-              </button>
+              </Link>
             </div>
           </div>
         </div>
