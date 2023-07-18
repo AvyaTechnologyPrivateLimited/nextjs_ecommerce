@@ -314,7 +314,14 @@ const ProductDetailPage = () => {
             {/* HEADING */}
             <div className="relative">
               <div className="aspect-w-16 aspect-h-16 relative">
-                111
+              <Image
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  src={data.image}
+                  className="w-full rounded-2xl object-cover"
+                  alt="product detail 1"
+                />
+
                 <Image
                   fill
                   sizes="(max-width: 640px) 100vw, 33vw"
