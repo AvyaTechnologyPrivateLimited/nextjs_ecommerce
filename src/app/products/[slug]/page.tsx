@@ -314,10 +314,11 @@ const ProductDetailPage = () => {
             {/* HEADING */}
             <div className="relative">
               <div className="aspect-w-16 aspect-h-16 relative">
+                111
                 <Image
                   fill
                   sizes="(max-width: 640px) 100vw, 33vw"
-                  src="https://nextjs-ecom-laravel-10-api.bybotech.com/public/uploads/shirt-2-1688117284.png"
+                  src="https://av-ecom-cms.avdemosites.com/uploads/shirt-5-1688117499.png"
                   className="w-full rounded-2xl object-cover"
                   alt="product detail 1"
                 />
