@@ -1,4 +1,4 @@
-let dev_url = process.env.NEXT_PUBLIC_LOCAL_API_URL;
+let dev_url = process.env.NEXT_PUBLIC_SERVER_API_URL;
 let server_url = process.env.NEXT_PUBLIC_SERVER_API_URL;
 
 const dev = {
